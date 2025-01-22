@@ -10,19 +10,44 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
-import static com.consol.citrus.actions.EchoAction.Builder.echo;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 
 
 public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
-    @Test(description = "Проверка, что показываются характеристиками уточки (кроме id) с чётным ID и материалом wood")
+    @Test(description = "Проверка, что уточка с корректным нечётным id и корректным звуком (quack) будет крякать")
     @CitrusTest
     public void DuckQuackWithOddIdAndCorrectSound(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
+        int duckId, repetitionCount = 1, soundCount = 1;
         double height = 0.15;
         String color = "string", material = "wood",
                 sound = "quack", wingsState = "ACTIVE";
+        //  quack является корректным звуком. Остальные дают звук moo
+        do {
+            // Не могу извлечь id из тела ответа и присвоить его переменной.
+            // получается вечный цикл создания уточки
+            createDuck(runner, color, height, material, sound, wingsState);
+            duckId = extractIdFromResponse(runner);
+            System.out.println("Extracted duckId: " + duckId);
+
+        } while (duckId % 2 != 1);
+
+        duckQuack(runner, duckId, repetitionCount, soundCount);
+        validateResponse(runner, "{\n" +
+                "\"sound\": \"quack\"\n" +
+                "}");
+        // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этого теста.
+    }
+
+
+    @Test(description = "Проверка, что уточка с корректным чётным id и корректным звуком (quack) будет крякать")
+    @CitrusTest
+    public void DuckQuackWithEvenIdAndCorrectSound(@Optional @CitrusResource TestCaseRunner runner) {
+        int duckId, repetitionCount = 1, soundCount = 1;
+        double height = 0.15;
+        String color = "string", material = "wood",
+                sound = "quack", wingsState = "ACTIVE";
+        //  quack является корректным звуком. Остальные дают звук moo
         do {
             // Не могу извлечь id из тела ответа и присвоить его переменной.
             // получается вечный цикл создания уточки
@@ -32,36 +57,13 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
 
         } while (duckId % 2 != 0);
 
-        showDuckProperties(runner, String.valueOf(duckId));
+        duckQuack(runner, duckId, repetitionCount, soundCount);
         validateResponse(runner, "{\n" +
-                " \"color\": \"" + color + "\",\n" +
-                " \"height\": " + height + ",\n" +
-                " \"material\": \"" + material + "\",\n" +
-                " \"sound\": \"" + sound + "\",\n" +
-                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+                "\"sound\": \"quack\"\n" +
+                "}");
+        // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этого теста.
     }
 
-
-    @Test(description = "Проверка, что приходит ответ с характеристиками уточки (кроме id) с нечётным ID и материалом")
-    @CitrusTest
-    public void DuckPropertiesWithOddId(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "rubber",
-                sound = "quack", wingsState = "ACTIVE";
-        do {
-            createDuck(runner, color, height, material, sound, wingsState);
-            duckId = extractIdFromResponse(runner);
-        } while (duckId % 2 != 1);
-
-        showDuckProperties(runner, String.valueOf(duckId));
-        validateResponse(runner, "{\n" +
-                " \"color\": \"" + color + "\",\n" +
-                " \"height\": " + height + ",\n" +
-                " \"material\": \"" + material + "\",\n" +
-                " \"sound\": \"" + sound + "\",\n" +
-                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
-    }
 
     public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {
         runner.$(
@@ -83,12 +85,14 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
     }
 
 
-    public void showDuckProperties(TestCaseRunner runner, String id) {
+    public void duckQuack(TestCaseRunner runner, int id, int repetitionCount, int soundCount) {
         runner.$(http()
                 .client("http://localhost:2222")
                 .send()
-                .get("/api/duck/action/properties")
-                .queryParam("id", id)
+                .get("/api/duck/action/quack")
+                .queryParam("id", String.valueOf(id))
+                .queryParam("repetitionCount", String.valueOf(repetitionCount))
+                .queryParam("soundCount", String.valueOf(soundCount))
         );
     }
 
