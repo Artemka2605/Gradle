@@ -1,5 +1,6 @@
 package autotests.duckActionController;
 
+import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
+import static com.consol.citrus.DefaultTestActionBuilder.action;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
@@ -30,14 +33,19 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
                 "\"message\": \"I am flying :)\"\n" +
                 "}");
 
-        //todo: в finaly сделать удаление созданной утки
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
     }
 
 
     @Test(description = "Проверка, что уточка со связанными крыльями НЕ может летать ")
     @CitrusTest
     public void DuckFlyWithFixedWings(@Optional @CitrusResource TestCaseRunner runner) {
-
         int duckId;
         double height = 0.15;
         String color = "string", material = "wood",
@@ -50,8 +58,15 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
                 "\"message\": \"I can not fly :C\"\n" +
                 "}");
 
-        //todo: в finaly сделать удаление созданной утки
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
     }
+
     @Test(description = "Проверка, что уточка с неопределённым значением крыльев выдаёт об этом сообщение")
     @CitrusTest
     public void DuckFlyWithUndefinedWings(@Optional @CitrusResource TestCaseRunner runner) {
@@ -68,7 +83,13 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
                 "\"message\": \"Wings are not detected :(\"\n" +
                 "}");
 
-        //todo: в finaly сделать удаление созданной утки
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
     }
 
     public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {

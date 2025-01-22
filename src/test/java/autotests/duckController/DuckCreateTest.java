@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
+import static com.consol.citrus.DefaultTestActionBuilder.action;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
@@ -31,6 +33,14 @@ public class DuckCreateTest extends TestNGCitrusSpringSupport {
                 " \"material\": \"" + material + "\",\n" +
                 " \"sound\": \"" + sound + "\",\n" +
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
     }
 
     @Test(description = "Проверка, что создаётся уточка с материалом wood")
@@ -50,6 +60,14 @@ public class DuckCreateTest extends TestNGCitrusSpringSupport {
                 " \"material\": \"" + material + "\",\n" +
                 " \"sound\": \"" + sound + "\",\n" +
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
     }
 
 

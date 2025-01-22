@@ -1,5 +1,6 @@
 package autotests.duckActionController;
 
+import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
+import static com.consol.citrus.DefaultTestActionBuilder.action;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 
@@ -37,6 +40,15 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
                 "\"sound\": \"quack\"\n" +
                 "}");
         // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этого теста.
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        int finalDuckId = duckId;
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, finalDuckId))
+                );
     }
 
 
@@ -62,6 +74,16 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
                 "\"sound\": \"quack\"\n" +
                 "}");
         // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этого теста.
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        int finalDuckId = duckId;
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, finalDuckId))
+                );
+
     }
 
 

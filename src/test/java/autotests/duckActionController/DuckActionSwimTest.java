@@ -1,5 +1,6 @@
 package autotests.duckActionController;
 
+import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
+import static com.consol.citrus.DefaultTestActionBuilder.action;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
@@ -31,7 +34,15 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
                 "}");
 
         // какой ожидаемый текст сообщения должен быть, "string" или "уточка поплыла"?
-        //todo: в finaly сделать удаление созданной утки
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
+
     }
 
 
@@ -50,7 +61,14 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
                 "\"message\": \"Paws are not found ((((\"\n" +
                 "}");
 
-        //todo: в finaly сделать удаление созданной утки
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, duckId))
+                );
+
     }
 
     public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {

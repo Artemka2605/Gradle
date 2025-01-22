@@ -1,5 +1,6 @@
 package autotests.duckActionController;
 
+import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,10 +11,11 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
-import static com.consol.citrus.actions.EchoAction.Builder.echo;
+import static com.consol.citrus.DefaultTestActionBuilder.action;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
-import static com.consol.citrus.variable.MessageHeaderVariableExtractor.Builder.fromHeaders;
+
 
 
 public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
@@ -40,6 +42,15 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
                 " \"material\": \"" + material + "\",\n" +
                 " \"sound\": \"" + sound + "\",\n" +
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        int finalDuckId = duckId;
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, finalDuckId))
+                );
     }
 
 
@@ -62,6 +73,16 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
                 " \"material\": \"" + material + "\",\n" +
                 " \"sound\": \"" + sound + "\",\n" +
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+
+        //удаление созданной утки
+        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        int finalDuckId = duckId;
+        doFinally()
+                .actions(
+                        action(context -> deleteTest
+                                .tryToDeleteDuck(runner, finalDuckId))
+                );
+
     }
 
     public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {
@@ -116,7 +137,6 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
                         .extract(fromBody().expression("$.id", "duckId"))
 
         );
-        //runner.getVariable();
         return runner.variable("duckId", duckId);
     }
 
