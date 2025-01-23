@@ -18,14 +18,17 @@ import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 
 
 public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
+    int duckId, repetitionCount = 1, soundCount = 1;
+    double height = 0.15;
+    String color = "string", material = "wood",
+            sound = "quack", wingsState = "ACTIVE";
+    //  quack является корректным звуком. Остальные дают звук moo
+    // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этих тестов теста.
+
     @Test(description = "Проверка, что уточка с корректным нечётным id и корректным звуком (quack) будет крякать")
     @CitrusTest
     public void DuckQuackWithOddIdAndCorrectSound(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId, repetitionCount = 1, soundCount = 1;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "ACTIVE";
-        //  quack является корректным звуком. Остальные дают звук moo
+
         do {
             // Не могу извлечь id из тела ответа и присвоить его переменной.
             // получается вечный цикл создания уточки
@@ -39,7 +42,6 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
         validateResponse(runner, "{\n" +
                 "\"sound\": \"quack\"\n" +
                 "}");
-        // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этого теста.
 
         //удаление созданной утки
         DuckDeleteTest deleteTest = new DuckDeleteTest();
@@ -55,11 +57,7 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
     @Test(description = "Проверка, что уточка с корректным чётным id и корректным звуком (quack) будет крякать")
     @CitrusTest
     public void DuckQuackWithEvenIdAndCorrectSound(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId, repetitionCount = 1, soundCount = 1;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "ACTIVE";
-        //  quack является корректным звуком. Остальные дают звук moo
+
         do {
             // Не могу извлечь id из тела ответа и присвоить его переменной.
             // получается вечный цикл создания уточки
@@ -73,7 +71,6 @@ public class DuckActionQuackTest extends TestNGCitrusSpringSupport {
         validateResponse(runner, "{\n" +
                 "\"sound\": \"quack\"\n" +
                 "}");
-        // проверяем одно повторение кряка и кол-во звуков, т.к. это не важно для этого теста.
 
         //удаление созданной утки
         DuckDeleteTest deleteTest = new DuckDeleteTest();

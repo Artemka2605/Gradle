@@ -17,14 +17,14 @@ import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
+    int duckId;
+    double height = 0.15;
+    String color = "string", material = "wood",
+            sound = "quack", wingsState = "ACTIVE";
 
     @Test(description = "Проверка, что уточка, существующая в бд (id), может плавать")
     @CitrusTest
     public void DuckSwimWithExistingID(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "ACTIVE";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);
@@ -48,11 +48,6 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
 
     @Test(description = "Проверка, что уточка, несуществующая в бд (нет такого id), не будет плавать")    @CitrusTest
     public void DuckSwimWithInvalidID(@Optional @CitrusResource TestCaseRunner runner) {
-
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "ACTIVE";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner) + 1; // +1 для взятия несуществующего id в БД

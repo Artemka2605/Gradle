@@ -16,13 +16,15 @@ import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckCreateTest extends TestNGCitrusSpringSupport {
+    int duckId;
+    double height = 0.15;
+    String color = "string", material,
+            sound = "string", wingsState = "ACTIVE";
+
     @Test(description = "Проверка, что создаётся уточка с материалом rubber")
     @CitrusTest
     public void DuckCreateWithRubberMaterial(@Optional @CitrusResource TestCaseRunner runner){
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "rubber",
-                sound = "string", wingsState = "ACTIVE";
+        material = "rubber";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);
@@ -46,10 +48,7 @@ public class DuckCreateTest extends TestNGCitrusSpringSupport {
     @Test(description = "Проверка, что создаётся уточка с материалом wood")
     @CitrusTest
     public void DuckCreateWithWoodMaterial(@Optional @CitrusResource TestCaseRunner runner){
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "string", wingsState = "ACTIVE";
+        material = "wood";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);

@@ -17,19 +17,20 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 
 public class DuckUpdateTest extends TestNGCitrusSpringSupport {
+    int duckId;
+    double height = 0.15;
+    String color = "string", material = "rubber",
+            sound = "string", wingsState = "ACTIVE";
+
     @Test(description = "Проверка, что у уточки изменяются свойства: 'цвет' и 'высота' ")
     @CitrusTest
     public void DuckUpdateColorAndHeight(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "rubber",
-                sound = "string", wingsState = "ACTIVE";
-
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
         // Новые параметры уточки:
         color = "blue";
         height = 0.05;
+
+        createDuck(runner, color, height, material, sound, wingsState);
+        duckId = extractIdFromResponse(runner);
         updateDuckColorAndHeight(runner, duckId, color, height, material, sound);
         validateResponse(runner, "{\n" +
                 "\"message\": \"Duck with id = " + duckId + "is updated\"\n" +
@@ -48,16 +49,12 @@ public class DuckUpdateTest extends TestNGCitrusSpringSupport {
     @Test(description = "Проверка, что у уточки изменяются свойства: 'цвет' и 'звук' ")
     @CitrusTest
     public void DuckUpdateColorAndSound(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "rubber",
-                sound = "string", wingsState = "ACTIVE";
-
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
         // Новые параметры уточки:
         color = "red";
         sound = "quack";
+
+        createDuck(runner, color, height, material, sound, wingsState);
+        duckId = extractIdFromResponse(runner);
         updateDuckColorAndHeight(runner, duckId, color, height, material, sound);
         validateResponse(runner, "{\n" +
                 "\"message\": \"Duck with id = " + duckId + "is updated\"\n" +

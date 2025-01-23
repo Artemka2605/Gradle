@@ -18,13 +18,16 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
 
+    int duckId;
+    double height = 0.15;
+    String color = "string", material = "wood",
+            sound = "quack",
+            wingsState;
+
     @Test(description = "Проверка, что уточка с активными крыльями может летать")
     @CitrusTest
     public void DuckFlyWithActiveWings(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "ACTIVE";
+        wingsState = "ACTIVE";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);
@@ -46,10 +49,7 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
     @Test(description = "Проверка, что уточка со связанными крыльями НЕ может летать ")
     @CitrusTest
     public void DuckFlyWithFixedWings(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "FIXED";
+        wingsState = "FIXED";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);
@@ -70,11 +70,7 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
     @Test(description = "Проверка, что уточка с неопределённым значением крыльев выдаёт об этом сообщение")
     @CitrusTest
     public void DuckFlyWithUndefinedWings(@Optional @CitrusResource TestCaseRunner runner) {
-
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "UNDEFINED";
+        wingsState = "UNDEFINED";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);

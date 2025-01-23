@@ -16,13 +16,14 @@ import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckDeleteTest extends TestNGCitrusSpringSupport {
+    int duckId;
+    double height = 0.15;
+    String color = "string", material = "rubber",
+            sound = "string", wingsState = "ACTIVE";
+
     @Test(description = "Проверка, что уточка удаляется")
     @CitrusTest
     public void DuckDelete(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "rubber",
-                sound = "string", wingsState = "ACTIVE";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);

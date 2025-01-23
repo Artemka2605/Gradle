@@ -19,13 +19,16 @@ import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 
 
 public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
+    int duckId;
+    double height = 0.15;
+    String color = "string", material,
+            sound = "quack", wingsState = "ACTIVE";
+
     @Test(description = "Проверка, что показываются характеристиками уточки (кроме id) с чётным ID и материалом wood")
     @CitrusTest
     public void DuckPropertiesWithEvenId(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "wood",
-                sound = "quack", wingsState = "ACTIVE";
+        material = "wood";
+
         do {
             // Не могу извлечь id из тела ответа и присвоить его переменной.
             // получается вечный цикл создания уточки
@@ -57,10 +60,8 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
     @Test(description = "Проверка, что приходит ответ с характеристиками уточки (кроме id) с нечётным ID и материалом rubber")
     @CitrusTest
     public void DuckPropertiesWithOddId(@Optional @CitrusResource TestCaseRunner runner) {
-        int duckId;
-        double height = 0.15;
-        String color = "string", material = "rubber",
-                sound = "quack", wingsState = "ACTIVE";
+        material = "rubber";
+
         do {
             createDuck(runner, color, height, material, sound, wingsState);
             duckId = extractIdFromResponse(runner);
@@ -139,24 +140,5 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
         );
         return runner.variable("duckId", duckId);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
