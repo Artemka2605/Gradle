@@ -27,7 +27,7 @@ public class DuckDeleteTest extends TestNGCitrusSpringSupport {
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);
-        tryToDeleteDuck(runner, duckId);
+       // deleteDuck(runner, duckId);
         validateResponse(runner, "{\n" +
                 "\"sound\": \"Duck is deleted\"\n" +
                 "}");
@@ -53,12 +53,12 @@ public class DuckDeleteTest extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void tryToDeleteDuck(TestCaseRunner runner, int id) {
+    public void deleteDuck(TestCaseRunner runner, String id) {
         runner.$(http()
                 .client("http://localhost:2222")
                 .send()
                 .delete("/api/duck/delete")
-                .queryParam("id", String.valueOf(id))
+                .queryParam("id", id)
         );
     }
 

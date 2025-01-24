@@ -149,10 +149,3 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
         );
     }
 }
-
-
-
-
-
-
-

@@ -37,12 +37,12 @@ public class DuckUpdateTest extends TestNGCitrusSpringSupport {
                 "}");
 
         //удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, duckId))
+//                );
     }
 
 
@@ -61,12 +61,12 @@ public class DuckUpdateTest extends TestNGCitrusSpringSupport {
                 "}");
 
         //удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, duckId))
+//                );
     }
 
 

@@ -36,12 +36,12 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
         // какой ожидаемый текст сообщения должен быть, "string" или "уточка поплыла"?
 
         //удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, duckId))
+//                );
 
     }
 
@@ -57,12 +57,12 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
                 "}");
 
         //удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, duckId))
+//                );
 
     }
 

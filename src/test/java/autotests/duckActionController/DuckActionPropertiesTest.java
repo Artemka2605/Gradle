@@ -47,13 +47,13 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
 
         //удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
-        int finalDuckId = duckId;
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, finalDuckId))
-                );
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        int finalDuckId = duckId;
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, finalDuckId))
+//                );
     }
 
 
@@ -76,13 +76,13 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
 
         //удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
-        int finalDuckId = duckId;
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, finalDuckId))
-                );
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        int finalDuckId = duckId;
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, finalDuckId))
+//                );
 
     }
 
