@@ -4,6 +4,7 @@ import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
+import com.consol.citrus.context.TestContext;
 import com.consol.citrus.message.MessageType;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
 import org.springframework.http.HttpStatus;
@@ -18,77 +19,85 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
 
-    int duckId;
-    double height = 0.15;
-    String color = "string", material = "wood",
-            sound = "quack",
-            wingsState;
-
     @Test(description = "Проверка, что уточка с активными крыльями может летать")
     @CitrusTest
-    public void DuckFlyWithActiveWings(@Optional @CitrusResource TestCaseRunner runner) {
-        wingsState = "ACTIVE";
+    public void DuckFlyWithActiveWings(@Optional @CitrusResource TestCaseRunner runner, @CitrusResource TestContext context) {
+        // создаём уточку и задаём переменные в контексте
+        runner.variable("color", "string");
+        runner.variable("height", 0.15);
+        runner.variable("material", "wood");
+        runner.variable("sound", "quack");
+        runner.variable("wingsState", "ACTIVE"); //
+        createDuck(runner, context);
 
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
-        duckTryToFly(runner, String.valueOf(duckId));
+        extractIdFromResponse(runner);
+        duckFly(runner, context.getVariable("${duckId}"));
         validateResponse(runner, "{\n" +
                 "\"message\": \"I am flying :)\"\n" +
                 "}");
 
-        //удаление созданной утки
+        // удаление созданной утки
         DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+        doFinally().actions(
+                runner.$(
+                        action(ctx ->
+                                deleteTest.deleteDuck(runner, context.getVariable("${duckId}")))
+                ));
     }
 
-
-    @Test(description = "Проверка, что уточка со связанными крыльями НЕ может летать ")
+    @Test(description = "Проверка, что уточка со связанными крыльями НЕ может летать")
     @CitrusTest
-    public void DuckFlyWithFixedWings(@Optional @CitrusResource TestCaseRunner runner) {
-        wingsState = "FIXED";
+    public void DuckFlyWithFixedWings(@Optional @CitrusResource TestCaseRunner runner, @CitrusResource TestContext context) {
+        // создаём уточку и задаём переменные в контексте
+        runner.variable("color", "string");
+        runner.variable("height", 0.15);
+        runner.variable("material", "wood");
+        runner.variable("sound", "quack");
+        runner.variable("wingsState", "FIXED"); //
+        createDuck(runner, context);
 
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
-        duckTryToFly(runner, String.valueOf(duckId));
+        extractIdFromResponse(runner);
+        duckFly(runner, context.getVariable("${duckId}"));
         validateResponse(runner, "{\n" +
                 "\"message\": \"I can not fly :C\"\n" +
                 "}");
 
-        //удаление созданной утки
+        // удаление созданной утки
         DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+        doFinally().actions(
+                runner.$(
+                        action(ctx ->
+                                deleteTest.deleteDuck(runner, context.getVariable("${duckId}")))
+                ));
     }
 
-    @Test(description = "Проверка, что уточка с неопределённым значением крыльев выдаёт об этом сообщение")
+    @Test(description = "Проверка, что уточка с неопределёнными крыльями может летать")
     @CitrusTest
-    public void DuckFlyWithUndefinedWings(@Optional @CitrusResource TestCaseRunner runner) {
-        wingsState = "UNDEFINED";
+    public void DuckFlyWithUndefinedWings(@Optional @CitrusResource TestCaseRunner runner, @CitrusResource TestContext context) {
+        // создаём уточку и задаём переменные в контексте
+        runner.variable("color", "string");
+        runner.variable("height", 0.15);
+        runner.variable("material", "wood");
+        runner.variable("sound", "quack");
+        runner.variable("wingsState", "UNDEFINED"); //
+        createDuck(runner, context);
 
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
-        duckTryToFly(runner, String.valueOf(duckId));
+        extractIdFromResponse(runner);
+        duckFly(runner, context.getVariable("${duckId}"));
         validateResponse(runner, "{\n" +
                 "\"message\": \"Wings are not detected :(\"\n" +
                 "}");
-
-        //удаление созданной утки
+        // удаление созданной утки
         DuckDeleteTest deleteTest = new DuckDeleteTest();
-        doFinally()
-                .actions(
-                        action(context -> deleteTest
-                                .tryToDeleteDuck(runner, duckId))
-                );
+        doFinally().actions(
+                runner.$(
+                        action(ctx ->
+                                deleteTest.deleteDuck(runner, context.getVariable("${duckId}")))
+                ));
     }
 
-    public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {
+
+    public void createDuck(@CitrusResource TestCaseRunner runner, @CitrusResource TestContext context) {
         runner.$(
                 http()
                         .client("http://localhost:2222")
@@ -98,17 +107,16 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
                         .contentType("application/json")
                         .body(
                                 "{\n" +
-                                        " \"color\": \"" + color + "\",\n" +
-                                        " \"height\": " + height + ",\n" +
-                                        " \"material\": \"" + material + "\",\n" +
-                                        " \"sound\": \"" + sound + "\",\n" +
-                                        " \"wingsState\": \"" + wingsState + "\"\n" + "} "
+                                        " \"color\": \"" + context.getVariable("${color}") + "\",\n" +
+                                        " \"height\": " + context.getVariable("${height}") + ",\n" +
+                                        " \"material\": \"" + context.getVariable("${material}") + "\",\n" +
+                                        " \"sound\": \"" + context.getVariable("${sound}") + "\",\n" +
+                                        " \"wingsState\": \"" + context.getVariable("${wingsState}")+ "\"\n" + "} "
                         )
         );
     }
 
-
-    public void duckTryToFly(TestCaseRunner runner, String id) {
+    public void duckFly(TestCaseRunner runner, String id) {
         runner.$(http()
                 .client("http://localhost:2222")
                 .send()
@@ -128,8 +136,7 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
         );
     }
 
-    public int extractIdFromResponse(TestCaseRunner runner) {
-        int duckId = -1;
+    public void extractIdFromResponse(@CitrusResource TestCaseRunner runner) {
         runner.$(
                 http()
                         .client("http://localhost:2222")
@@ -140,7 +147,6 @@ public class DuckActionFlyTest extends TestNGCitrusSpringSupport {
                         .extract(fromBody().expression("$.id", "duckId"))
 
         );
-        return runner.variable("duckId", duckId);
     }
 }
 
