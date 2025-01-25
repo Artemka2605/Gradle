@@ -1,6 +1,6 @@
-package autotests.duckActionController;
+package OldAutotests.duckController.duckActionController;
 
-import autotests.duckController.DuckDeleteTest;
+import OldAutotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;

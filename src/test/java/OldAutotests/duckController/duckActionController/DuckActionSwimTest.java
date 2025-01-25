@@ -1,6 +1,5 @@
-package autotests.duckActionController;
+package OldAutotests.duckController.duckActionController;
 
-import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -11,77 +10,55 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
-import static com.consol.citrus.DefaultTestActionBuilder.action;
-import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
+import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
-
-
-public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
+public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
     int duckId;
     double height = 0.15;
-    String color = "string", material,
+    String color = "string", material = "wood",
             sound = "quack", wingsState = "ACTIVE";
 
-    @Test(description = "Проверка, что показываются характеристиками уточки (кроме id) с чётным ID и материалом wood")
+    @Test(description = "Проверка, что уточка, существующая в бд (id), может плавать")
     @CitrusTest
-    public void DuckPropertiesWithEvenId(@Optional @CitrusResource TestCaseRunner runner) {
-        material = "wood";
+    public void DuckSwimWithExistingID(@Optional @CitrusResource TestCaseRunner runner) {
 
-        do {
-            // Не могу извлечь id из тела ответа и присвоить его переменной.
-            // получается вечный цикл создания уточки
-            createDuck(runner, color, height, material, sound, wingsState);
-            duckId = extractIdFromResponse(runner);
-            System.out.println("Extracted duckId: " + duckId);
-
-        } while (duckId % 2 != 0);
-
-        showDuckProperties(runner, String.valueOf(duckId));
+        createDuck(runner, color, height, material, sound, wingsState);
+        duckId = extractIdFromResponse(runner);
+        duckTryToSwim(runner, String.valueOf(duckId));
         validateResponse(runner, "{\n" +
-                " \"color\": \"" + color + "\",\n" +
-                " \"height\": " + height + ",\n" +
-                " \"material\": \"" + material + "\",\n" +
-                " \"sound\": \"" + sound + "\",\n" +
-                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+                "\"message\": \"string\"\n" +
+                "}");
+
+        // какой ожидаемый текст сообщения должен быть, "string" или "уточка поплыла"?
 
         //удаление созданной утки
 //        DuckDeleteTest deleteTest = new DuckDeleteTest();
-//        int finalDuckId = duckId;
 //        doFinally()
 //                .actions(
 //                        action(context -> deleteTest
-//                                .tryToDeleteDuck(runner, finalDuckId))
+//                                .tryToDeleteDuck(runner, duckId))
 //                );
+
     }
 
 
-    @Test(description = "Проверка, что приходит ответ с характеристиками уточки (кроме id) с нечётным ID и материалом rubber")
-    @CitrusTest
-    public void DuckPropertiesWithOddId(@Optional @CitrusResource TestCaseRunner runner) {
-        material = "rubber";
+    @Test(description = "Проверка, что уточка, несуществующая в бд (нет такого id), не будет плавать")    @CitrusTest
+    public void DuckSwimWithInvalidID(@Optional @CitrusResource TestCaseRunner runner) {
 
-        do {
-            createDuck(runner, color, height, material, sound, wingsState);
-            duckId = extractIdFromResponse(runner);
-        } while (duckId % 2 != 1);
-
-        showDuckProperties(runner, String.valueOf(duckId));
+        createDuck(runner, color, height, material, sound, wingsState);
+        duckId = extractIdFromResponse(runner) + 1; // +1 для взятия несуществующего id в БД
+        duckTryToSwim(runner, String.valueOf(duckId));
         validateResponse(runner, "{\n" +
-                " \"color\": \"" + color + "\",\n" +
-                " \"height\": " + height + ",\n" +
-                " \"material\": \"" + material + "\",\n" +
-                " \"sound\": \"" + sound + "\",\n" +
-                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+                "\"message\": \"Paws are not found ((((\"\n" +
+                "}");
 
         //удаление созданной утки
 //        DuckDeleteTest deleteTest = new DuckDeleteTest();
-//        int finalDuckId = duckId;
 //        doFinally()
 //                .actions(
 //                        action(context -> deleteTest
-//                                .tryToDeleteDuck(runner, finalDuckId))
+//                                .tryToDeleteDuck(runner, duckId))
 //                );
 
     }
@@ -106,11 +83,11 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
     }
 
 
-    public void showDuckProperties(TestCaseRunner runner, String id) {
+    public void duckTryToSwim(TestCaseRunner runner, String id) {
         runner.$(http()
                 .client("http://localhost:2222")
                 .send()
-                .get("/api/duck/action/properties")
+                .get("/api/duck/action/swim")
                 .queryParam("id", id)
         );
     }
@@ -140,5 +117,11 @@ public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
         );
         return runner.variable("duckId", duckId);
     }
-
 }
+
+
+
+
+
+
+

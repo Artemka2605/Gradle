@@ -1,6 +1,5 @@
-package autotests.duckActionController;
+package OldAutotests.duckController;
 
-import autotests.duckController.DuckDeleteTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -16,24 +15,26 @@ import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
-public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
+public class DuckCreateTest extends TestNGCitrusSpringSupport {
     int duckId;
     double height = 0.15;
-    String color = "string", material = "wood",
-            sound = "quack", wingsState = "ACTIVE";
+    String color = "string", material,
+            sound = "string", wingsState = "ACTIVE";
 
-    @Test(description = "Проверка, что уточка, существующая в бд (id), может плавать")
+    @Test(description = "Проверка, что создаётся уточка с материалом rubber")
     @CitrusTest
-    public void DuckSwimWithExistingID(@Optional @CitrusResource TestCaseRunner runner) {
+    public void DuckCreateWithRubberMaterial(@Optional @CitrusResource TestCaseRunner runner){
+        material = "rubber";
 
         createDuck(runner, color, height, material, sound, wingsState);
         duckId = extractIdFromResponse(runner);
-        duckTryToSwim(runner, String.valueOf(duckId));
         validateResponse(runner, "{\n" +
-                "\"message\": \"string\"\n" +
-                "}");
-
-        // какой ожидаемый текст сообщения должен быть, "string" или "уточка поплыла"?
+                " \"color\": \"" + color + "\",\n" +
+                " \"height\": " + height + ",\n" +
+                " \"id\": " + duckId + ",\n" +
+                " \"material\": \"" + material + "\",\n" +
+                " \"sound\": \"" + sound + "\",\n" +
+                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
 
         //удаление созданной утки
 //        DuckDeleteTest deleteTest = new DuckDeleteTest();
@@ -42,19 +43,22 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
 //                        action(context -> deleteTest
 //                                .tryToDeleteDuck(runner, duckId))
 //                );
-
     }
 
-
-    @Test(description = "Проверка, что уточка, несуществующая в бд (нет такого id), не будет плавать")    @CitrusTest
-    public void DuckSwimWithInvalidID(@Optional @CitrusResource TestCaseRunner runner) {
+    @Test(description = "Проверка, что создаётся уточка с материалом wood")
+    @CitrusTest
+    public void DuckCreateWithWoodMaterial(@Optional @CitrusResource TestCaseRunner runner){
+        material = "wood";
 
         createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner) + 1; // +1 для взятия несуществующего id в БД
-        duckTryToSwim(runner, String.valueOf(duckId));
+        duckId = extractIdFromResponse(runner);
         validateResponse(runner, "{\n" +
-                "\"message\": \"Paws are not found ((((\"\n" +
-                "}");
+                " \"color\": \"" + color + "\",\n" +
+                " \"height\": " + height + ",\n" +
+                " \"id\": " + duckId + ",\n" +
+                " \"material\": \"" + material + "\",\n" +
+                " \"sound\": \"" + sound + "\",\n" +
+                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
 
         //удаление созданной утки
 //        DuckDeleteTest deleteTest = new DuckDeleteTest();
@@ -63,8 +67,8 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
 //                        action(context -> deleteTest
 //                                .tryToDeleteDuck(runner, duckId))
 //                );
-
     }
+
 
     public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {
         runner.$(
@@ -85,16 +89,6 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
         );
     }
 
-
-    public void duckTryToSwim(TestCaseRunner runner, String id) {
-        runner.$(http()
-                .client("http://localhost:2222")
-                .send()
-                .get("/api/duck/action/swim")
-                .queryParam("id", id)
-        );
-    }
-
     public void validateResponse(TestCaseRunner runner, String responseMessage) {
         runner.$(http()
                 .client("http://localhost:2222")
@@ -105,6 +99,7 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
                 .body(responseMessage)
         );
     }
+
 
     public int extractIdFromResponse(TestCaseRunner runner) {
         int duckId = -1;
@@ -118,13 +113,7 @@ public class DuckActionSwimTest extends TestNGCitrusSpringSupport {
                         .extract(fromBody().expression("$.id", "duckId"))
 
         );
+        //runner.getVariable();
         return runner.variable("duckId", duckId);
     }
 }
-
-
-
-
-
-
-

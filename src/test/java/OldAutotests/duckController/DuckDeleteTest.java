@@ -1,4 +1,4 @@
-package autotests.duckController;
+package OldAutotests.duckController;
 
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;

@@ -1,4 +1,4 @@
-package autotests.duckController;
+package OldAutotests.duckController.duckActionController;
 
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
@@ -10,65 +10,78 @@ import org.springframework.http.MediaType;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
-import static com.consol.citrus.DefaultTestActionBuilder.action;
-import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
-import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 
-public class DuckCreateTest extends TestNGCitrusSpringSupport {
+
+
+public class DuckActionPropertiesTest extends TestNGCitrusSpringSupport {
     int duckId;
     double height = 0.15;
     String color = "string", material,
-            sound = "string", wingsState = "ACTIVE";
+            sound = "quack", wingsState = "ACTIVE";
 
-    @Test(description = "Проверка, что создаётся уточка с материалом rubber")
+    @Test(description = "Проверка, что показываются характеристиками уточки (кроме id) с чётным ID и материалом wood")
     @CitrusTest
-    public void DuckCreateWithRubberMaterial(@Optional @CitrusResource TestCaseRunner runner){
-        material = "rubber";
-
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
-        validateResponse(runner, "{\n" +
-                " \"color\": \"" + color + "\",\n" +
-                " \"height\": " + height + ",\n" +
-                " \"id\": " + duckId + ",\n" +
-                " \"material\": \"" + material + "\",\n" +
-                " \"sound\": \"" + sound + "\",\n" +
-                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
-
-        //удаление созданной утки
-//        DuckDeleteTest deleteTest = new DuckDeleteTest();
-//        doFinally()
-//                .actions(
-//                        action(context -> deleteTest
-//                                .tryToDeleteDuck(runner, duckId))
-//                );
-    }
-
-    @Test(description = "Проверка, что создаётся уточка с материалом wood")
-    @CitrusTest
-    public void DuckCreateWithWoodMaterial(@Optional @CitrusResource TestCaseRunner runner){
+    public void DuckPropertiesWithEvenId(@Optional @CitrusResource TestCaseRunner runner) {
         material = "wood";
 
-        createDuck(runner, color, height, material, sound, wingsState);
-        duckId = extractIdFromResponse(runner);
+        do {
+            // Не могу извлечь id из тела ответа и присвоить его переменной.
+            // получается вечный цикл создания уточки
+            createDuck(runner, color, height, material, sound, wingsState);
+            duckId = extractIdFromResponse(runner);
+            System.out.println("Extracted duckId: " + duckId);
+
+        } while (duckId % 2 != 0);
+
+        showDuckProperties(runner, String.valueOf(duckId));
         validateResponse(runner, "{\n" +
                 " \"color\": \"" + color + "\",\n" +
                 " \"height\": " + height + ",\n" +
-                " \"id\": " + duckId + ",\n" +
                 " \"material\": \"" + material + "\",\n" +
                 " \"sound\": \"" + sound + "\",\n" +
                 " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
 
         //удаление созданной утки
 //        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        int finalDuckId = duckId;
 //        doFinally()
 //                .actions(
 //                        action(context -> deleteTest
-//                                .tryToDeleteDuck(runner, duckId))
+//                                .tryToDeleteDuck(runner, finalDuckId))
 //                );
     }
 
+
+    @Test(description = "Проверка, что приходит ответ с характеристиками уточки (кроме id) с нечётным ID и материалом rubber")
+    @CitrusTest
+    public void DuckPropertiesWithOddId(@Optional @CitrusResource TestCaseRunner runner) {
+        material = "rubber";
+
+        do {
+            createDuck(runner, color, height, material, sound, wingsState);
+            duckId = extractIdFromResponse(runner);
+        } while (duckId % 2 != 1);
+
+        showDuckProperties(runner, String.valueOf(duckId));
+        validateResponse(runner, "{\n" +
+                " \"color\": \"" + color + "\",\n" +
+                " \"height\": " + height + ",\n" +
+                " \"material\": \"" + material + "\",\n" +
+                " \"sound\": \"" + sound + "\",\n" +
+                " \"wingsState\": \"" + wingsState + "\"\n" + "} ");
+
+        //удаление созданной утки
+//        DuckDeleteTest deleteTest = new DuckDeleteTest();
+//        int finalDuckId = duckId;
+//        doFinally()
+//                .actions(
+//                        action(context -> deleteTest
+//                                .tryToDeleteDuck(runner, finalDuckId))
+//                );
+
+    }
 
     public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {
         runner.$(
@@ -89,6 +102,16 @@ public class DuckCreateTest extends TestNGCitrusSpringSupport {
         );
     }
 
+
+    public void showDuckProperties(TestCaseRunner runner, String id) {
+        runner.$(http()
+                .client("http://localhost:2222")
+                .send()
+                .get("/api/duck/action/properties")
+                .queryParam("id", id)
+        );
+    }
+
     public void validateResponse(TestCaseRunner runner, String responseMessage) {
         runner.$(http()
                 .client("http://localhost:2222")
@@ -99,7 +122,6 @@ public class DuckCreateTest extends TestNGCitrusSpringSupport {
                 .body(responseMessage)
         );
     }
-
 
     public int extractIdFromResponse(TestCaseRunner runner) {
         int duckId = -1;
@@ -113,7 +135,7 @@ public class DuckCreateTest extends TestNGCitrusSpringSupport {
                         .extract(fromBody().expression("$.id", "duckId"))
 
         );
-        //runner.getVariable();
         return runner.variable("duckId", duckId);
     }
+
 }
