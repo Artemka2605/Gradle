@@ -10,7 +10,21 @@ repositories {
 }
 
 dependencies {
+    testImplementation group: 'com.consol.citrus', name: 'citrus-base', version: '3.4.0'
+    testImplementation group: 'com.consol.citrus', name: 'citrus-testng', version: '3.4.0'
+    testImplementation group: 'com.consol.citrus', name: 'citrus-spring', version: '3.4.0'
+    testImplementation group: 'com.consol.citrus', name: 'citrus-http', version: '3.4.0'
+    testImplementation group: 'com.consol.citrus', name: 'citrus-validation-json', version: '3.4.0'
+    testImplementation group: 'org.slf4j', name: 'slf4j-reload4j', version: '2.0.7'
+
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
 }
 
 test {
+    useTestNG()
 }
