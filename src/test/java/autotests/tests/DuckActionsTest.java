@@ -53,11 +53,12 @@ public class DuckActionsTest extends DuckActionsClient {
                 "}");
 
         // удаление созданной утки
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
+        //DuckDeleteTest deleteTest = new DuckDeleteTest();
+
+
         doFinally().actions(
                 runner.$(
-                        action(ctx ->
-                                deleteTest.deleteDuck(runner, context.getVariable("${duckId}")))
+                        action(ctx -> deleteDuck(runner, context.getVariable("${duckId}")))
                 ));
     }
 
@@ -214,11 +215,9 @@ public class DuckActionsTest extends DuckActionsClient {
                 "\"message\": \"string\"\n" +
                 "}");
 
-        DuckDeleteTest deleteTest = new DuckDeleteTest();
         doFinally().actions(
                 runner.$(
-                        action(ctx ->
-                                deleteTest.deleteDuck(runner, context.getVariable("${duckId}")))
+                        action(ctx -> deleteDuck(runner, context.getVariable("${duckId}")))
                 ));
     }
 
