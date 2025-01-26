@@ -1,12 +1,17 @@
 package autotests;
 
+import autotests.payloads.DuckCreate;
+import autotests.payloads.DuckWingsState;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.message.MessageType;
+import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,16 +26,25 @@ public class BaseTest extends TestNGCitrusSpringSupport {
     @Autowired
     protected HttpClient duckService;
 
-    public void setDuckVariablesInRunner(@CitrusResource TestCaseRunner runner){
-        // устанавливает стандартные переменные, которые переопределяются в тестах, в контекст runner.
-        runner.variable("color", "string");
-        runner.variable("height", 0.15);
-        runner.variable("material", "wood");
-        runner.variable("sound", "quack");
-        runner.variable("wingsState", "ACTIVE");
+//    public void setDuckVariablesInRunner(@CitrusResource TestCaseRunner runner){
+//        // устанавливает стандартные переменные, которые переопределяются в тестах, в контекст runner.
+//        runner.variable("color", "string");
+//        runner.variable("height", 0.15);
+//        runner.variable("material", "wood");
+//        runner.variable("sound", "quack");
+//        runner.variable("wingsState", "ACTIVE");
+//    }
+
+    public DuckCreate createDuckObject() {
+        return new DuckCreate()
+                .color("string")
+                .height(0.15)
+                .material("wood")
+                .sound("quack")
+                .wingsState(DuckWingsState.ACTIVE);
     }
 
-    public void createDuck(@CitrusResource TestCaseRunner runner, @CitrusResource TestContext context) {
+    public void createDuck(@CitrusResource TestCaseRunner runner, Object duckCreateBody) {
         runner.$(
                 http()
                         .client(duckService)
@@ -38,14 +52,7 @@ public class BaseTest extends TestNGCitrusSpringSupport {
                         .post("/api/duck/create")
                         .message()
                         .contentType("application/json")
-                        .body(
-                                "{\n" +
-                                        " \"color\": \"" + context.getVariable("${color}") + "\",\n" +
-                                        " \"height\": " + context.getVariable("${height}") + ",\n" +
-                                        " \"material\": \"" + context.getVariable("${material}") + "\",\n" +
-                                        " \"sound\": \"" + context.getVariable("${sound}") + "\",\n" +
-                                        " \"wingsState\": \"" + context.getVariable("${wingsState}")+ "\"\n" + "} "
-                        )
+                        .body(new ObjectMappingPayloadBuilder(duckCreateBody, new ObjectMapper()))
         );
     }
 
@@ -58,22 +65,21 @@ public class BaseTest extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner,  @CitrusResource TestContext context) {
+    public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner, String duckId, DuckCreate duck) {
         runner.$(http()
                 .client(duckService)
                 .send()
                 .put("/api/duck/update")
-                .queryParam("color", context.getVariable("${color}"))
-                .queryParam("height", context.getVariable("${height}"))
-                .queryParam("id", context.getVariable("${duckId}"))
-                .queryParam("material", context.getVariable("${material}"))
-                .queryParam("sound", context.getVariable("${sound}"))
-
+                .queryParam("color", duck.color())
+                .queryParam("height", String.valueOf(duck.height()))
+                .queryParam("id", duckId)
+                .queryParam("material",duck.material())
+                .queryParam("sound", duck.sound())
         );
     }
 
 
-    public void validateResponse(@CitrusResource TestCaseRunner runner, String responseMessage) {
+    public void validateResponseFromString(@CitrusResource TestCaseRunner runner, String responseMessage) {
         runner.$(http()
                 .client(duckService)
                 .receive()
@@ -81,6 +87,28 @@ public class BaseTest extends TestNGCitrusSpringSupport {
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(responseMessage)
+        );
+    }
+
+    public void validateResponseFromResources(@CitrusResource TestCaseRunner runner, String expectedPayload) {
+        runner.$(http()
+                .client(duckService)
+                .receive()
+                .response(HttpStatus.OK)
+                .message()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new ClassPathResource(expectedPayload))
+        );
+    }
+
+    public void validateResponseFromPayload(@CitrusResource TestCaseRunner runner, Object expectedPayload) {
+        runner.$(http()
+                .client(duckService)
+                .receive()
+                .response(HttpStatus.OK)
+                .message()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new ObjectMappingPayloadBuilder(expectedPayload, new ObjectMapper()))
         );
     }
 
