@@ -14,6 +14,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 import static com.consol.citrus.DefaultTestActionBuilder.action;
+import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
 import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 
 public class DuckActionsTest extends DuckActionsClient {
