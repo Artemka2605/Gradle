@@ -1,10 +1,8 @@
 package autotests;
 
-import autotests.payloads.DuckCreate;
-import autotests.payloads.DuckWingsState;
+import autotests.payloads.DuckCreatePayload;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
-import com.consol.citrus.context.TestContext;
 import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.message.MessageType;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
@@ -31,29 +29,11 @@ public class BaseTest extends TestNGCitrusSpringSupport {
     @Autowired
     protected SingleConnectionDataSource dataBaseConnection;
 
-//    public void setDuckVariablesInRunner(@CitrusResource TestCaseRunner runner){
-//        // устанавливает стандартные переменные, которые переопределяются в тестах, в контекст runner.
-//        runner.variable("color", "string");
-//        runner.variable("height", 0.15);
-//        runner.variable("material", "wood");
-//        runner.variable("sound", "quack");
-//        runner.variable("wingsState", "ACTIVE");
-//    }
-
-    public DuckCreate createDuckObject() {
-        return new DuckCreate()
-                .color("string")
-                .height(0.15)
-                .material("wood")
-                .sound("quack")
-                .wingsState(DuckWingsState.ACTIVE);
+    public void dbCreateDuck(@CitrusResource TestCaseRunner runner, DuckCreate duckCreateBody) {
+        runner.$(sql(dataBaseConnection)
+                .statement("SELECT * FROM DUCK WHERE ... =" + duckCreateBody.color() + "'")
+        );
     }
-
-//    public void dbCreateDuck(@CitrusResource TestCaseRunner runner, DuckCreate duckCreateBody) {
-//        runner.$(sql(dataBaseConnection)
-//                .statement("SELECT * FROM DUCK WHERE ... =" + duckCreateBody.color() + "'")
-//        );
-//    }
 
     public void createDuck(@CitrusResource TestCaseRunner runner, Object duckCreateBody) {
         runner.$(
@@ -67,16 +47,16 @@ public class BaseTest extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void deleteDuck(TestCaseRunner runner, String id) {
+    public void deleteDuck(TestCaseRunner runner) {
         runner.$(http()
                 .client(duckService)
                 .send()
                 .delete("/api/duck/delete")
-                .queryParam("id", id)
+                .queryParam("id", "${duckId}")
         );
     }
 
-    public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner, String duckId, DuckCreate duck) {
+    public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner, String duckId, DuckCreatePayload duck) {
         runner.$(http()
                 .client(duckService)
                 .send()
