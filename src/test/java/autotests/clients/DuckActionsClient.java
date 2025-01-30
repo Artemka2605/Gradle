@@ -13,7 +13,6 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 @ContextConfiguration(classes = {EndpointConfig.class})
 public class DuckActionsClient extends BaseTest {
     // здесь лежат универсальные методы (создать, удалить уточку, получить айди, валидация ответа)
-    // если универсальные, то переносим сюда
 
     @Autowired
     protected HttpClient duckService;
