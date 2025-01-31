@@ -6,6 +6,7 @@ import com.consol.citrus.http.client.HttpClient;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -50,6 +51,7 @@ public class BaseTest extends TestNGCitrusSpringSupport {
         return uniqueId;
     }
 
+    @Step("Эндпоинт для удаления уточки")
     public void deleteDuck(TestCaseRunner runner) {
         runner.$(http()
                 .client(duckService)
@@ -59,6 +61,7 @@ public class BaseTest extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Эндпоинт для обновления параметров уточки")
     public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner, String color, Double height, String material, String sound) {
         runner.$(http()
                 .client(duckService)
