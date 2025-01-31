@@ -1,10 +1,8 @@
 package autotests;
 
-import autotests.payloads.DuckCreatePayload;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.message.MessageType;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +14,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ContextConfiguration;
 
 import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
-import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
+import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 
@@ -29,22 +27,27 @@ public class BaseTest extends TestNGCitrusSpringSupport {
     @Autowired
     protected SingleConnectionDataSource dataBaseConnection;
 
-    public void dbCreateDuck(@CitrusResource TestCaseRunner runner, DuckCreate duckCreateBody) {
+    public void dbQuery(@CitrusResource TestCaseRunner runner, String query) {
         runner.$(sql(dataBaseConnection)
-                .statement("SELECT * FROM DUCK WHERE ... =" + duckCreateBody.color() + "'")
-        );
+                .statement(query));
     }
 
-    public void createDuck(@CitrusResource TestCaseRunner runner, Object duckCreateBody) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .post("/api/duck/create")
-                        .message()
-                        .contentType("application/json")
-                        .body(new ObjectMappingPayloadBuilder(duckCreateBody, new ObjectMapper()))
-        );
+    public String getUniqueId(@CitrusResource TestCaseRunner runner) {
+        String uniqueId;
+        boolean isUnique = false;
+        int count = 0;
+        do {
+            uniqueId = String.valueOf((int) (Math.random() * 10000));
+
+            runner.$(query(dataBaseConnection)
+                    .statement("SELECT COUNT(*) AS count FROM DUCK WHERE ID = "+uniqueId));
+            count = runner.variable("count", count);
+            if (count == 0){
+                isUnique = true;
+            }
+        } while (!isUnique);
+
+        return uniqueId;
     }
 
     public void deleteDuck(TestCaseRunner runner) {
@@ -56,16 +59,16 @@ public class BaseTest extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner, String duckId, DuckCreatePayload duck) {
+    public void updateDuckColorAndHeight(@CitrusResource TestCaseRunner runner, String color, Double height, String material, String sound) {
         runner.$(http()
                 .client(duckService)
                 .send()
                 .put("/api/duck/update")
-                .queryParam("color", duck.color())
-                .queryParam("height", String.valueOf(duck.height()))
-                .queryParam("id", duckId)
-                .queryParam("material",duck.material())
-                .queryParam("sound", duck.sound())
+                .queryParam("color", color)
+                .queryParam("height", String.valueOf(height))
+                .queryParam("id", "${duckId}")
+                .queryParam("material", material)
+                .queryParam("sound", sound)
         );
     }
 
@@ -100,19 +103,6 @@ public class BaseTest extends TestNGCitrusSpringSupport {
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(new ObjectMappingPayloadBuilder(expectedPayload, new ObjectMapper()))
-        );
-    }
-
-    public void extractIdFromResponse(@CitrusResource TestCaseRunner runner) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(HttpStatus.OK)
-                        .message()
-                        .type(MessageType.JSON)
-                        .extract(fromBody().expression("$.id", "duckId"))
-
         );
     }
 }

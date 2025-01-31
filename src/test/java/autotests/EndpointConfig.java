@@ -18,7 +18,7 @@ public class EndpointConfig {
     public SingleConnectionDataSource db(){
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:mem:ducks");
+        dataSource.setUrl("jdbc:h2:tcp://localhost:9092/mem:ducks");
         dataSource.setUsername("dev");
         dataSource.setPassword("dev");
         return dataSource;
