@@ -1,7 +1,8 @@
 package autotests.tests.DuckActionController;
 
 import autotests.clients.DuckActionsClient;
-import autotests.payloads.DuckCreatePayload;
+import autotests.payloads.DuckPropertiesPayload;
+import autotests.payloads.DuckWingsState;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -22,48 +23,61 @@ public class PropertiesTest extends DuckActionsClient {
         String id;
         runner.$(doFinally().actions(ctx -> dbQuery(runner,
                 "DELETE FROM DUCK WHERE ID=${duckId}")));
-        do {
+        do{
             id = getUniqueId(runner);
-            runner.variable("duckId", id);
-            // создание утки
-            dbQuery(runner, "INSERT INTO DUCK (ID, COLOR, HEIGHT, MATERIAL, SOUND, WINGS_STATE)\n" +
-                    "VALUES (${duckId}, 'string', 0.15, 'wood', 'quack', 'UNDEFINED');");
-            if (Integer.parseInt(runner.variable("${duckId}", id)) % 2 == 0){
-                break;
-            }
-            dbQuery(runner,
-                    "DELETE FROM DUCK WHERE ID=${duckId}"
-            );
-        } while (Integer.parseInt(runner.variable("${duckId}", id)) % 2 != 0);
+        } while (Integer.parseInt(id) % 2 != 0);
+
+        // Переменные для уточки. Пытался сделать их в одном месте.
+        runner.variable("duckId", id);
+        runner.variable("color", "string");
+        runner.variable("height", 0.15);
+        runner.variable("material", "wood");
+        runner.variable("sound", "quack");
+        runner.variable("wings_state", DuckWingsState.UNDEFINED);
+        // создание утки
+        dbQuery(runner, "INSERT INTO DUCK (ID, COLOR, HEIGHT, MATERIAL, SOUND, WINGS_STATE)\n" +
+                "VALUES (${duckId}, '${color}', ${height}, '${material}', '${sound}', '${wings_state}');");
+
         showDuckProperties(runner, "${duckId}");
         // в ответе приходит пустой ответ (пустой json) и валидация ответа проваливается
-        DuckCreatePayload duck = new DuckCreatePayload();
+        DuckPropertiesPayload duck = new DuckPropertiesPayload()
+                .color("${color}")
+                .height(Double.parseDouble(runner.variable("height", "${height}")))
+                .material("${material}")
+                .sound("${sound}")
+                .wingsState(DuckWingsState.valueOf(runner.variable("wings_state", "${wings_state}")));
         validateResponseFromPayload(runner, duck);
     }
-
-    // в ответе приходит пустой ответ (пустой json) и валидация ответа проваливается вместе с тестом.
+    //  в ответе приходит значение высоты умноженное на 100 и валидация проваливается.
     @Test(description = "Проверка, что приходит ответ с характеристиками уточки (кроме id) с нечётным ID и материалом rubber")
     @CitrusTest
     public void DuckPropertiesWithOddId(@Optional @CitrusResource TestCaseRunner runner) {
         String id;
         runner.$(doFinally().actions(ctx -> dbQuery(runner,
                 "DELETE FROM DUCK WHERE ID=${duckId}")));
-        do {
+        do{
             id = getUniqueId(runner);
-            runner.variable("duckId", id);
-            // создание утки
-            dbQuery(runner, "INSERT INTO DUCK (ID, COLOR, HEIGHT, MATERIAL, SOUND, WINGS_STATE)\n" +
-                    "VALUES (${duckId}, 'string', 0.15, 'rubber', 'quack', 'UNDEFINED');");
-            if (Integer.parseInt(runner.variable("${duckId}", id)) % 2 == 1){
-                break;
-            }
-            dbQuery(runner,
-                    "DELETE FROM DUCK WHERE ID=${duckId}"
-            );
-        } while (Integer.parseInt(runner.variable("${duckId}", id)) % 2 != 1);
+        } while (Integer.parseInt(id) % 2 != 1);
+
+        // Переменные для уточки. Пытался сделать их в одном месте.
+        runner.variable("duckId", id);
+        runner.variable("color", "string");
+        runner.variable("height", 0.15);
+        runner.variable("material", "rubber");
+        runner.variable("sound", "quack");
+        runner.variable("wings_state", DuckWingsState.UNDEFINED);
+
+        // создание утки
+        dbQuery(runner, "INSERT INTO DUCK (ID, COLOR, HEIGHT, MATERIAL, SOUND, WINGS_STATE)\n" +
+                "VALUES (${duckId}, '${color}', ${height}, '${material}', '${sound}', '${wings_state}');");
+
         showDuckProperties(runner, "${duckId}");
-        // в ответе приходит пустой ответ (пустой json) и валидация ответа проваливается
-        DuckCreatePayload duck = new DuckCreatePayload();
+        DuckPropertiesPayload duck = new DuckPropertiesPayload()
+                .color("${color}")
+                .height(Double.parseDouble(runner.variable("height", "${height}")))
+                .material("${material}")
+                .sound("${sound}")
+                .wingsState(DuckWingsState.valueOf(runner.variable("wings_state", "${wings_state}")));
         validateResponseFromPayload(runner, duck);
     }
 }
