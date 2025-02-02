@@ -1,6 +1,6 @@
 package autotests.tests.DuckController;
 
-import autotests.clients.DuckActionsClient;
+import autotests.clients.DuckControllerClient;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -13,7 +13,7 @@ import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 
 @Epic("Тесты на duck-controller")
 @Feature("Эндпоинт /api/duck/delete")
-public class DeleteTest extends DuckActionsClient {
+public class DeleteTest extends DuckControllerClient {
     @Test(description = "Проверка, что уточка удаляется")
     @CitrusTest
     public void DuckDelete(@Optional @CitrusResource TestCaseRunner runner) {
@@ -25,7 +25,7 @@ public class DeleteTest extends DuckActionsClient {
         dbQuery(runner, "INSERT INTO DUCK (ID, COLOR, HEIGHT, MATERIAL, SOUND, WINGS_STATE)\n" +
                 "VALUES (${duckId}, 'string', 0.15, 'rubber', 'quack', 'ACTIVE');");
 
-        deleteDuck(runner);
+        deleteDuck(runner, "${duckId}");
         validateResponseFromString(runner, "{\n" +
                 "\"message\": \"Duck is deleted\"\n" +
                 "}");
