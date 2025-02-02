@@ -1,6 +1,6 @@
 package autotests.tests.DuckActionController;
 
-import autotests.clients.DuckActionsClient;
+import autotests.clients.DuckActionControllerClient;
 import autotests.payloads.DuckPropertiesPayload;
 import autotests.payloads.DuckWingsState;
 import com.consol.citrus.TestCaseRunner;
@@ -15,7 +15,7 @@ import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 
 @Epic("Тесты на duck-action-controller")
 @Feature("Эндпоинт /api/duck/action/properties")
-public class PropertiesTest extends DuckActionsClient {
+public class PropertiesTest extends DuckActionControllerClient {
     // в ответе приходит пустой ответ (пустой json) и валидация ответа проваливается вместе с тестом.
     @Test(description = "Проверка, что приходит ответ с характеристиками уточки (кроме id) с чётным ID и материалом wood")
     @CitrusTest

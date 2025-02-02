@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
+// Не является payload для создания уточки. Для создания вызывается DuckPropertiesPayload.
 public class DuckCreatePayload {
     @JsonProperty
     private int id;

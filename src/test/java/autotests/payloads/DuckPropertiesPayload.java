@@ -12,7 +12,9 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
-// согласно требованиям для duck-service-1.0.0, ожидаемый ответ от properties будет с такими свойствами
+// Согласно требованиям для duck-service-1.0.0, ожидаемый ответ от properties будет с такими свойствами.
+// Используется для создания уточки с набором необходимых полей (5)
+// Также данная модель используется для валидации ответа метода properties "/api/duck/action/properties"
 public class DuckPropertiesPayload {
     @JsonProperty
     private String color;

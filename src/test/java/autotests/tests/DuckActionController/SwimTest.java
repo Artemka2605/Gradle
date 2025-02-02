@@ -1,6 +1,6 @@
 package autotests.tests.DuckActionController;
 
-import autotests.clients.DuckActionsClient;
+import autotests.clients.DuckActionControllerClient;
 import autotests.payloads.MessageStringPayload;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
@@ -14,7 +14,7 @@ import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 
 @Epic("Тесты на duck-action-controller")
 @Feature("Эндпоинт /api/duck/action/swim")
-public class SwimTest extends DuckActionsClient {
+public class SwimTest extends DuckActionControllerClient {
 
     // ошибка 404 (лапки не найдены), хотя уточка существует в бд. ОР: 200 OK
     @Test(description = "Проверка, что уточка, существующая в бд (id), может плавать")
